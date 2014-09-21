@@ -3,7 +3,6 @@
 	#include <opencv2/highgui/highgui.hpp>
 	#include "SDL/SDL.h"
 
-	// I am making a second test
 	/*
 	 * A simple 'getting started' interface to the ARDrone, v0.2
 	 * author: Tom Krajnik
