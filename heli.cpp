@@ -26,7 +26,7 @@
 	bool firstclick=true, histob = false;
 
 	//Laptop camera or drone camera
-	bool laptopcamera = true;
+	bool laptopcamera = false;
 	
 	//Images
 	Mat freezeImage = Mat(240, 320, CV_8UC3);
@@ -47,15 +47,12 @@
 	float hue, sat, val, b, g, r;
 
 	//Matrices Histrogramas
-	int Blue[255], Green[255], Red[255];
+	int Blue[255], Green[255], Red[255] = {0};
 
 	//Variables para los valores de intensidad con el ratón
 	int bli=0; int blm=0; int blf=0;
 	int gli=0; int glm=0; int glf=0;
 	int rli=0; int rlm=0; int rlf=0;
-	int hli=0; int hlm=0; int hlf=0;
-	int sli=0; int slm=0; int slf=0;
-	int vli=0; int vlm=0; int vlf=0;
 
 	int minh=255; int maxh=0;
 	int mins=255; int maxs=0;
@@ -71,9 +68,9 @@
 		//Se obtiene el valor de cada pixel
 		for (int y = 0; y < src.rows; ++y)
 			for (int x = 0; x < src.cols; ++x){
-				azul=src.at<Vec3b>(y,x)[0];
-				verde=src.at<Vec3b>(y,x)[1];
-				rojo=src.at<Vec3b>(y,x)[2];
+				azul=src.at<Vec3b>(x,y)[0];
+				verde=src.at<Vec3b>(x,y)[1];
+				rojo=src.at<Vec3b>(x,y)[2];
 				//El valor es la posición en el arreglo(0-255) y se incrementa
 				Blue[azul]+=1;
 				Green[verde]+=1;
@@ -104,7 +101,7 @@
 		//Se dibuja el histrograma en RGB
 			for(int i=0; i<255; i++)
 			{
-				Blue[i]=Blue[i]/(maxb/100); //Reducir el tamaño de los valores del histograma
+				Blue[i]=Blue[i]/(mxb/100); //Reducir el tamaño de los valores del histograma
 				if(i>0)
 					line(hist_B, Point(i-1,135-Blue[i-1]), Point(i,135-Blue[i]), Scalar(255, 0, 0), 2, 8, 0  ); //Dibujar linea desde la coordenada del valor anterior al nuevo
 				else
@@ -115,7 +112,7 @@
 			
 			for(int i=0; i<255; i++)
 			{
-				Green[i]=Green[i]/(maxg/100);
+				Green[i]=Green[i]/(mxg/100);
 				if(i>0)
 					line(hist_G, Point(i-1,135-Green[i-1]), Point(i,135-Green[i]), Scalar(0, 255, 0), 2, 8, 0  );
 				else
@@ -126,7 +123,7 @@
 			
 			for(int i=0; i<255; i++)
 			{
-				Red[i]=Red[i]/(maxr/100);
+				Red[i]=Red[i]/(mxr/100);
 				if(i>0)
 					line(hist_R, Point(i-1,135-Red[i-1]), Point(i,135-Red[i]), Scalar(0, 0, 255), 2, 8, 0  );
 				else
@@ -144,6 +141,10 @@
 		line(hist_R, Point(rli,135), Point(rli,50), Scalar(0, 0, 0), 2, 8, 0  );
 		line(hist_R, Point(rlf,135), Point(rlf,50), Scalar(100, 100, 100), 2, 8, 0  );
 		line(hist_R, Point(rlm,135), Point(rlm,50), Scalar(255, 100, 255), 2, 8, 0  );
+		
+		
+		
+		
 		
 		//Crear las ventanas para cada histograma y los muestra
 			namedWindow("RGB Histogram Blue", CV_WINDOW_AUTOSIZE );
@@ -177,7 +178,7 @@
 
 	//Función que elimina los colores fuera del rango
 void deleteColor(const Mat &sourceImage, Mat &sourceHSVImage)
-	{
+	{	
 		coloredImage = sourceImage.clone();
 		coloredHSVImage = sourceHSVImage.clone();
 		Mat mask, maskHSV;
@@ -407,11 +408,17 @@ void deleteColor(const Mat &sourceImage, Mat &sourceHSVImage)
 						break; // se sale del programa
 					case 'h': // Histograma o no
 						if (histob == false)
+						{
 							histob = true;
+							histograma(freezeImage);
+						}
 						else
-							{
-								histob = false;
-							}
+						{
+							histob = false;
+							destroyWindow("RGB Histogram Blue");
+							destroyWindow("RGB Histogram Green");
+							destroyWindow("RGB Histogram Red");
+						}
 						break;
 					case 'x': exit(0);
 					break;
